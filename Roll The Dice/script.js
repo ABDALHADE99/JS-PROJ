@@ -15,6 +15,7 @@ function roll() {
         }
     )
     let one = Math.floor(Math.random()*6);
+    
     let tow = Math.floor(Math.random()*6);
     console.log(one,tow);
     let totale = document.querySelector("#total").innerHTML = "المجموع "+ (2+(one + tow));
