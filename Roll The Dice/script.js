@@ -22,4 +22,5 @@ function roll() {
     document.querySelector("#die-1").setAttribute("src",imges[one]);
     document.querySelector("#die-2").setAttribute("src",imges[tow]);
 }
+console.log("عبد المعين");
 roll()

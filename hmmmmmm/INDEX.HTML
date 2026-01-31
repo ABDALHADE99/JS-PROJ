@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kaoru Hana wa Rin to Saku — Pinterest Gallery</title>
+  <meta name="description" content="Responsive gallery showing selected Pinterest images for Kaoru_Hana_wa_Rin_to_Saku." />
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  <div class="wrap">
+<h1>
+اسمي هو  (آية)، لقد بلغتُ من العمر 21 سنة، وكانت هذه هي تجربتي في الحياة: يوم أنجح ويوم أفشل.  
+ومع كل هذه الضغوط والصعوبات، أنا سعيدة بالمستوى الذي وصلتُ إليه، وفخورة بنفسي.
+</h1>
+
+    <div id="grid" class="grid"></div>
+
+    <section class="player-section">
+      <h2>Background Video / Audio</h2>
+      <p style="color:#6b7280;max-width:800px;margin:6px auto 0"></p>
+      
+<div class="player-wrapper" id="playerWrapper">
+  <iframe id="ytplayer" 
+    src="https://www.youtube.com/embed/n_SwUqNigGo?enablejsapi=1&rel=0&controls=1&loop=1&playlist=n_SwUqNigGo&autoplay=1"
+    allow="autoplay" allowfullscreen>
+  </iframe>
+</div>
+
+
+      <div class="player-controls">
+        <button class="btn" id="playBtn">Play</button>
+        <button class="btn" id="pauseBtn">Pause</button>
+        <button class="btn ghost" id="muteBtn">Mute</button>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="lightbox" class="lightbox">
+    <span class="close" id="lbClose">&times;</span>
+    <div class="lb-content">
+      <img id="lbImg" class="lb-img" src="" alt="" />
+      <div class="lb-text" id="lbText">Write description here...
+        لقد تعلمت الطبخ و اصبحت افضل طباخه'
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    const imageData = [
+      {src:'https://i.pinimg.com/236x/14/68/a6/1468a6e530e9a459d4d1cce604ccc8fe.jpg',
+      title:'1',
+      desc:'كنت ح نكتب كلام اهني لكن اكتشف انه ح يطلع عاطفي وانتي تضايقي منه فاااااااااا انتي تعرفي الباقي'},
+      {src:'https://i.pinimg.com/236x/f9/f8/f0/f9f8f09770ee0806c1ab3a2843732fc4.jpg',
+      title:'2',
+      desc:'كنت ح نكتب كلام اهني لكن اكتشف انه ح يطلع عاطفي وانتي تضايقي منه فاااااااااا انتي تعرفي الباقي'},
+      {src:'https://i.pinimg.com/236x/84/30/fe/8430fe261b9e92263e6733373949d546.jpg',
+      title:'لقد تعلمت الطبخ و اصبحت افضل طباخه',
+      desc:'استطيف ان اطهو افضل الوجبات و ألذ الحلويات لقد بذلت جهدي في هاد انا افضل طباخة فل عالم ههههههههه '},
+      {src:'https://i.pinimg.com/236x/01/e5/75/01e57538d372bc289b761e072498b3a3.jpg', title:' Image 4',
+        desc:'كنت ح نكتب كلام اهني لكن اكتشف انه ح يطلع عاطفي وانتي تضايقي منه فاااااااااا انتي تعرفي الباقي'},
+
+      {src:'https://i.pinimg.com/236x/da/07/87/da07871ed166a0e9e5e19d673ef550a3.jpg', title:'5',
+        desc:'تعبير وجهي واني غلطانا و نعرف اروحي غلطانه و انه فاهما الموضوع غلط لكن اني ما نغلطش'},
+      {src:'https://i.pinimg.com/236x/4a/9e/4f/4a9e4f109e8d9bafd4b593028f9d1b00.jpg', title:'6',
+        desc:'الوصف اللي تحبه'
+      },
+      {src:'https://i.pinimg.com/236x/aa/22/af/aa22af5122b36162cadc832d279055eb.jpg', title:'اصبح عندي اسنان و اعرف كيف اهجم'
+        ,desc:'فل واقع اتذكر عندما قام احدهم بي جرحي '
+      },
+      {src:'https://i.pinimg.com/236x/9c/8d/78/9c8d78a253af0cc2bd3583e94864ca43.jpg', title:'اوحيبو تربياتئ الاطفال',
+        desc:'اكثر شيئ اوحيبو فعله هو التربيه اشعر أني اصنع في المصتقبل '
+      },
+      {src:'https://i.pinimg.com/236x/3f/f0/40/3ff04073dd3f6f56e393b34da46548f5.jpg', title:'الحمدالله',
+        desc:'انا فخورة بي نفسي '
+      },
+      {src:'https://i.pinimg.com/236x/38/8f/4c/388f4c265473470a012b6cb2292b5abe.jpg', title:'10'
+        ,desc:'"الناس دائمآ ما يسئلوني عن نومي العميق و لماذ انا استمتع بي وقتي \n  ك أني ليس لدي هموم فل حياة انهم لا يفكيرون. هل تعلم قم مقذار ألم الرئس الذي يأتيني عنذما اعرف انه انا لا اقرئ في شيئ استهويه و فوق من ذاليك كل ما افكر انه يجب ان اتزوج تأتيني حالة هستيريه اعني ليس كل الريجال جيديآ وثما لماذ عليا ذاليك وربما الرجل يكون خائآ او ربمام لا يهتم بي هل انا التي تفكر بي هادي الطريقة كل ما اوريده هو النوم ربما استيقض من هاد الحلم كلام الناس جاريح كثيرآ انهم فقط يأخذون لا يعطون "'},
+      {src:'https://i.pinimg.com/736x/e9/69/fd/e969fdcb87533dd00ae6e72168cb1191.jpg', title:'11'
+        ,desc:'كل ما أرتادي ملابس جديده اتذكر انه ليست جميلة لكن انا التي اجعالوها جميلة'
+      },
+      {src:'https://i.pinimg.com/236x/b8/ac/20/b8ac20da2256a38524113b962dfddb7b.jpg', title:'12'
+        ,desc:'ما نقذرش نوصف كمية المعناه لي تحصلي فاه امته تقري شيئ ما تحباشي فا تفضلي اكتبي '
+      },
+      {src:'https://i.pinimg.com/236x/5d/56/97/5d56977894b5e239812d45bbc50d3253.jpg', title:'13'
+        ,desc:'كنت ح نكتب كلام اهني لكن اكتشف انه ح يطلع عاطفي وانتي تضايقي منه فاااااااااا انتي تعرفي الباقي'
+      },
+      {src:'https://i.pinimg.com/236x/3e/b2/a8/3eb2a8e5b96efc8a8511627dff6602f8.jpg', title:'14'
+        ,desc:'كنت ح نكتب كلام اهني لكن اكتشف انه ح يطلع عاطفي وانتي تضايقي منه فاااااااااا انتي تعرفي الباقي'
+      },
+      {src:'https://i.pinimg.com/236x/0c/54/c5/0c54c58e9250534f1ad57d24d89dc85d.jpg', title:'محريج'
+        ,desc:'لقد وقعث في الكثير من المواقف المحريجه '
+      },
+      {src:'https://i.pinimg.com/236x/4d/4c/f2/4d4cf23c1661fa4b0800fce20bf48d8c.jpg', title:'لااااااااااا'
+        ,desc:'تفضلي اكتبي لي تبيه >>>>>>>>>>>>>>متطفيلة>>>>>>>'
+      },
+    ];
+
+    const grid = document.getElementById('grid');
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbText = document.getElementById('lbText');
+    const lbClose = document.getElementById('lbClose');
+
+    function createCard(item){
+      const card = document.createElement('div');
+      card.className='card';
+      const img = document.createElement('img');
+      img.src=item.src;
+      img.alt=item.title;
+      img.addEventListener('click',()=>openLightbox(item));
+      const meta=document.createElement('div');
+      meta.className='meta';
+      meta.textContent=item.title;
+      card.appendChild(img); card.appendChild(meta);
+      return card;
+    }
+
+    function render(){
+      grid.innerHTML='';
+      imageData.forEach(it=>grid.appendChild(createCard(it)));
+    }
+
+    function openLightbox(item){
+      lb.classList.add('open');
+      lbImg.src=item.src;
+      lbText.textContent=item.desc || 'No description provided.';
+    }
+
+    lbClose.addEventListener('click',()=>lb.classList.remove('open'));
+    lb.addEventListener('click',(e)=>{if(e.target===lb) lb.classList.remove('open')});
+
+    render();
+
+    let player;
+    function onYouTubeIframeAPIReady(){
+      player = new YT.Player('ytplayer', {
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+    }
+    function onPlayerReady(event){
+      try{ event.target.playVideo(); }catch(e){console.warn('Autoplay blocked or failed:', e); }
+    }
+
+    // Controls
+    document.getElementById('playBtn').addEventListener('click',()=>{ if(player) player.playVideo(); });
+    document.getElementById('pauseBtn').addEventListener('click',()=>{ if(player) player.pauseVideo(); });
+    document.getElementById('muteBtn').addEventListener('click',function(){ if(!player) return; const isMuted = player.isMuted(); if(isMuted){ player.unMute(); this.textContent='Mute'; } else { player.mute(); this.textContent='Unmute'; } });
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- اعلاش تفتشي فل كود هاد مش من حقيك -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- واااااااااااااااااك 
+ 
+متطفيلة
+تعبت هلباااااااااااا باش بنيته و فوق منهاد كنت نبني فيه جنب خوتي تعرفي شن كان بي صير لو شافوه  
+
+لكن كل عادة هاد غير مهم 
+لكن المهم فيه نظريه نبيكي تسمعاها لي هي 
+لو البنت اعطيت قلبها لي الشخص الغلظ   لي ح إصير بي كل بساطه انه ح
+يتكسر هداك القلب فا هاد اعلاش بعض البنات حذيرات في هاد الموضوع 
+بذات لو اكتشفو انه الشخص لي قدامهم استغلالي و لا يهتم بي
+....
+اعلاش انقول في هاد الكلام  
+الحق مش عارف لكن لي اعرفته انحاول انبرير الموقف امتاعيك بسسسسسسس
+انحاول نفهميك
+يعني نقذر انقول انه هاد هو السبب اعلاش ما تبيش اتكوني عاطفيه 
+و لي هاد السبب ما تبيش تعطي اهتيماميك لي حد لي انه لو اعطيتيه اهتيماميك بي كل بساطه يقذر 
+يئذيك و هو يضحك 
+فاااااااااااا رسمي قلبيك ياخذه شخص يستحقه و ليس شخص يكسره
+هياااااااااااااا
+هياااااا
+خلاص اني نكرهيك 
+
+ههههههههههه
+ضحكه شريره
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+شوفي هو صح اني نكرهيك لكن 
+هاد ما يعنيش ما تكلمينيش بي صوتيك 
+
+
+احم احم  لو سمحتي 
+
+هي خلاص احني متعاركيآ
+-->

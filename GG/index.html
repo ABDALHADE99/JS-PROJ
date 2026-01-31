@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electrical Engineer Portfolio</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', sans-serif;
+    }
+    .brand-gradient {
+      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .card-hover:hover {
+      transform: translateY(-6px);
+      transition: transform 0.3s ease;
+    }
+    .btn-primary {
+      background-color: #10b981;
+      color: white;
+      transition: background 0.3s ease;
+    }
+    .btn-primary:hover { background-color: #059669; }
+    .btn-outline {
+      border: 1px solid #6b7280;
+      color: #374151;
+      transition: all 0.3s ease;
+    }
+    .btn-outline:hover { background-color: #f3f4f6; }
+
+    /* Theme variations */
+    body.theme-blue {
+      background: #f3f4f6;
+      color: #111827;
+    }
+    body.theme-blue .brand-gradient {
+      background: linear-gradient(135deg, #2563EB, #3B82F6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.theme-blue .btn-primary { background-color: #2563EB; }
+    body.theme-blue .btn-primary:hover { background-color: #1E40AF; }
+
+    body.theme-dark {
+      background: #111827;
+      color: #F9FAFB;
+    }
+    body.theme-dark .brand-gradient {
+      background: linear-gradient(135deg, #F97316, #FB923C);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.theme-dark .btn-primary { background-color: #F97316; color: #fff; }
+    body.theme-dark .btn-primary:hover { background-color: #EA580C; }
+
+    body.theme-green {
+      background: #ffffff;
+      color: #111827;
+    }
+    body.theme-green .brand-gradient {
+      background: linear-gradient(135deg, #065F46, #10B981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.theme-green .btn-primary { background-color: #065F46; color: #fff; }
+    body.theme-green .btn-primary:hover { background-color: #064E3B; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 theme-blue">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-sky-500 flex items-center justify-center text-white font-semibold">EK</div>
+        <div>
+          <h1 class="text-lg font-semibold brand-gradient">Electrical Engineer — Libya</h1>
+          <p class="text-sm text-gray-500">Fluent in English · Power systems & electronics</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <nav class="hidden md:flex gap-6 items-center">
+          <a href="#about" class="text-sm hover:underline">About</a>
+          <a href="#projects" class="text-sm hover:underline">Projects</a>
+          <a href="#skills" class="text-sm hover:underline">Skills</a>
+          <a href="#contact" class="text-sm hover:underline">Contact</a>
+          <a href="resume.pdf" download class="inline-flex items-center gap-2 text-sm">Resume</a>
+        </nav>
+        <button id="themeToggle" class="px-3 py-1 border rounded text-sm">Change Theme</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main class="max-w-5xl mx-auto px-6 py-12">
+    <section class="grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">Hi — I’m an <span class="brand-gradient">Electrical Engineer</span> based in Libya.</h2>
+        <p class="mt-4 text-lg text-gray-600">
+          I deliver practical, code-compliant electrical solutions for renewable energy, industrial automation, and building systems.
+        </p>
+        <div class="mt-6 flex gap-4">
+          <a href="#projects" class="px-4 py-2 rounded btn-primary">View Projects</a>
+          <a href="#contact" class="px-4 py-2 rounded btn-outline">Get in touch</a>
+        </div>
+        <div class="mt-6 text-sm text-gray-500 space-y-2">
+          <div>📍 Tripoli, Libya</div>
+          <div>💬 English — Fluent</div>
+        </div>
+      </div>
+      <div class="w-full h-64 md:h-80 bg-gray-100 rounded-2xl flex items-center justify-center shadow-inner">
+        <img src="https://via.placeholder.com/200" alt="Profile photo" class="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-white" />
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="mt-14">
+      <h3 class="text-2xl font-semibold brand-gradient">About Me</h3>
+      <p class="mt-4 text-base text-gray-600 leading-relaxed">
+        I am an Electrical Engineer with experience designing and commissioning power systems, motor control, and electrical installations. Fluent in English and able to collaborate with international teams.
+      </p>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="mt-14">
+      <h3 class="text-2xl font-semibold brand-gradient">Selected Projects</h3>
+      <div class="mt-6 grid sm:grid-cols-2 gap-6">
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Off-grid Solar Power Design</h4>
+          <p class="mt-2 text-sm text-gray-600">Standalone PV system for a rural clinic. Delivered 24/7 power with redundancy.</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Industrial Motor Control Panel</h4>
+          <p class="mt-2 text-sm text-gray-600">Motor control center with PLC interface, reducing downtime by 30%.</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Building Electrical Layout</h4>
+          <p class="mt-2 text-sm text-gray-600">Load calculation, lighting, and earthing for a mixed-use building.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="mt-14">
+      <h3 class="text-2xl font-semibold brand-gradient">Skills & Tools</h3>
+      <div class="mt-4 grid sm:grid-cols-2 gap-6">
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Technical Skills</h4>
+          <ul class="mt-3 list-disc ml-5 text-sm text-gray-600 space-y-1">
+            <li>Power system studies and protection coordination</li>
+            <li>PV system design & battery storage</li>
+            <li>Motor control & automation</li>
+            <li>Electrical drafting & single-line diagrams</li>
+          </ul>
+        </div>
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Software & Tools</h4>
+          <ul class="mt-3 list-disc ml-5 text-sm text-gray-600 space-y-1">
+            <li>ETAP / MATLAB / AutoCAD</li>
+            <li>Proteus / SPICE</li>
+            <li>MS Office, Google Workspace</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="mt-14">
+      <h3 class="text-2xl font-semibold brand-gradient">Contact</h3>
+      <p class="mt-2 text-sm text-gray-600">Send me a message or download my CV.</p>
+      <div class="mt-6 grid md:grid-cols-2 gap-6 items-start">
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Get in touch</h4>
+          <form class="mt-4 space-y-3" action="mailto:youremail@example.com" method="post" enctype="text/plain">
+            <input class="w-full p-2 rounded border" placeholder="Your name" name="name" />
+            <input class="w-full p-2 rounded border" placeholder="you@example.com" name="email" />
+            <textarea class="w-full p-2 rounded border" rows="4" placeholder="Message" name="message"></textarea>
+            <button type="submit" class="px-4 py-2 btn-primary rounded">Send Email</button>
+          </form>
+        </div>
+        <div class="p-4 rounded-2xl bg-white shadow card-hover">
+          <h4 class="font-semibold">Details</h4>
+          <ul class="mt-3 text-sm text-gray-600 space-y-1">
+            <li><strong>Location:</strong> Tripoli, Libya</li>
+            <li><strong>Language:</strong> English — Fluent</li>
+            <li><strong>Email:</strong> youremail@example.com</li>
+            <li><strong>Availability:</strong> Open to freelance & full-time opportunities</li>
+          </ul>
+          <div class="mt-4">
+            <h5 class="text-sm font-medium">Social</h5>
+            <div class="mt-2 flex gap-3">
+              <a href="#" class="text-sm underline">LinkedIn</a>
+              <a href="#" class="text-sm underline">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-10 text-center text-sm text-gray-500">
+      © <span id="year"></span> Electrical Engineer — Libya. All rights reserved.
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const themes = ['theme-blue', 'theme-dark', 'theme-green'];
+    let currentTheme = 0;
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.body.classList.remove(themes[currentTheme]);
+      currentTheme = (currentTheme + 1) % themes.length;
+      document.body.classList.add(themes[currentTheme]);
+    });
+  </script>
+</body>
+</html>
