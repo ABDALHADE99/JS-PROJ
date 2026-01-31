@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clothing Store — Product Filter & Search (Improved)</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--muted:#69707a;--accent:#0b69ff;--danger:#e74c3c;--glass:rgba(255,255,255,0.6)}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, Arial;margin:0;background:linear-gradient(180deg,var(--bg),#eef2fb);color:#1b1f23}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--card);box-shadow:0 2px 8px rgba(11,105,255,0.04)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#6b8bff);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    .search{flex:1;margin:0 20px}
+    .search input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #e6e9ef}
+    .actions{display:flex;gap:12px;align-items:center}
+    button,.btn{background:var(--accent);color:white;border:none;padding:10px 12px;border-radius:8px;cursor:pointer}
+    .btn.secondary{background:white;color:var(--accent);border:1px solid #e6e9ef}
+    main{display:grid;grid-template-columns:260px 1fr;gap:18px;padding:20px}
+    .panel{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(11,105,255,0.03)}
+    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .product{background:var(--card);padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:10px}
+    .product img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+    .meta{display:flex;justify-content:space-between;align-items:center}
+    .price{font-weight:700}
+    .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef6ff;color:var(--accent)}
+    .cart-drawer{position:fixed;right:18px;bottom:18px;width:420px;max-width:96%;background:var(--card);border-radius:12px;box-shadow:0 12px 30px rgba(9,30,66,0.12);padding:12px;}
+    .cart-items{max-height:320px;overflow:auto}
+    .cart-item{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed #eef2fb}
+    .qty{display:flex;align-items:center;gap:6px}
+    .muted{color:var(--muted);font-size:13px}
+    footer{padding:18px;text-align:center;color:var(--muted)}
+    .status-pill{padding:6px 8px;border-radius:999px;font-size:12px}
+    .st-pending{background:#fff4d6;color:#9a6b00}
+    .st-shipped{background:#e6f7ff;color:#055160}
+    .st-completed{background:#ecffef;color:#1b6a2f}
+    .st-canceled{background:#ffeef0;color:#9a2b2f}
+    @media (max-width:900px){main{grid-template-columns:1fr}.cart-drawer{left:10px;right:10px;width:auto}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><div class="logo">PF</div><div><div style="font-weight:700">Product Filter</div><div class="muted" style="font-size:12px">Clothing store demo</div></div></div>
+    <div class="search"><input id="searchInput" placeholder="Search products: name, category..." /></div>
+    <div class="actions"><button id="openAdminBtn" class="btn secondary">Admin</button><button id="openCartBtn" class="btn">Cart (<span id="cartCount">0</span>)</button></div>
+  </header>
+
+  <main>
+    <aside class="panel filters">
+      <h4>Filters</h4>
+      <div><label>Category</label><select id="categoryFilter" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #e6e9ef"><option value="all">All</option></select></div>
+      <div style="margin-top:10px"><label>Price range</label><div style="display:flex;gap:8px;margin-top:6px"><input id="minPrice" placeholder="min" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e9ef" /><input id="maxPrice" placeholder="max" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e9ef" /></div></div>
+      <div style="margin-top:12px;display:flex;gap:8px"><button id="applyFilters" class="btn">Apply</button><button id="clearFilters" class="btn secondary">Clear</button></div>
+
+      <hr style="margin:12px 0" />
+      <h4>Exchange / Return / Cancel</h4>
+      <form id="returnForm">
+        <div style="margin-bottom:8px"><input id="orderIdInput" placeholder="Order ID" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e9ef" required /></div>
+        <div style="margin-bottom:8px"><select id="reason" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e9ef"><option value="return">Return - Wrong size / dislike</option><option value="exchange">Exchange - Different size</option><option value="defect">Defect / Damaged</option><option value="cancel">Cancel Order (before shipping)</option></select></div>
+        <div style="margin-bottom:8px"><input id="comments" placeholder="Optional notes" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e9ef" /></div>
+        <div style="display:flex;gap:8px"><button type="submit" class="btn">Submit request</button></div>
+      </form>
+
+      <hr style="margin:12px 0" />
+      <h4>Your Orders (this session)</h4>
+      <div id="myOrders" class="muted">No orders yet. Place an order to see it here.</div>
+    </aside>
+
+    <section>
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0">Products</h3><div class="muted" id="resultInfo">Showing all products</div></div>
+        <div class="products" id="productsGrid"></div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="panel" id="emptyStats" style="display:none"><h4>Order History (demo)</h4><div class="muted">Orders placed during this browser session will appear in the admin area.</div></div>
+    </section>
+  </main>
+
+  <div id="cartDrawer" class="cart-drawer" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>Your Cart</strong><button id="closeCart" class="btn secondary">Close</button></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><div><div class="muted">Total</div><div style="font-weight:700" id="cartTotal">$0.00</div></div><div style="display:flex;gap:8px"><button id="clearCart" class="btn secondary">Clear</button><button id="checkout" class="btn">Checkout</button></div></div>
+  </div>
+
+  <div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(11,13,30,0.45);align-items:center;justify-content:center;padding:20px">
+    <div style="max-width:980px;width:100%;background:var(--card);border-radius:12px;padding:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><strong>Admin Dashboard</strong><div style="display:flex;gap:8px"><button id="closeAdmin" class="btn secondary">Close</button></div></div>
+      <div id="adminContent"></div>
+    </div>
+  </div>
+
+  <footer>Built as a single-file example — open `index.html` in your browser. Data stored in browser localStorage (demo only).</footer>
+
+  <script>
+    const SAMPLE_PRODUCTS = [
+      {id:'p1',title:'Classic White T-Shirt',category:'Tops',price:19.99,qty:10,img:'https://images.unsplash.com/photo-1520975911034-5d0ce7a2e2a4?w=800&q=60'},
+      {id:'p2',title:'Blue Denim Jacket',category:'Outerwear',price:69.0,qty:5,img:'https://images.unsplash.com/photo-1562158070-91f0a8c7e2a9?w=800&q=60'},
+      {id:'p3',title:'Black Chinos',category:'Bottoms',price:45.0,qty:8,img:'https://images.unsplash.com/photo-1562158070-2f4d1e0b9d2a?w=800&q=60'},
+      {id:'p4',title:'Summer Dress',category:'Dresses',price:59.99,qty:6,img:'https://images.unsplash.com/photo-1520975911034-5d0ce7a2e2a4?w=800&q=60'},
+      {id:'p5',title:'Sneakers',category:'Shoes',price:79.0,qty:15,img:'https://images.unsplash.com/photo-1600180758890-7b2a3b1a1b2a?w=800&q=60'},
+      {id:'p6',title:'Wool Scarf',category:'Accessories',price:24.0,qty:20,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&q=60'}
+    ];
+
+    const state = {
+      products: JSON.parse(localStorage.getItem('pf_products')) || SAMPLE_PRODUCTS,
+      cart: JSON.parse(localStorage.getItem('pf_cart')) || {},
+      orders: JSON.parse(localStorage.getItem('pf_orders')) || [],
+      returns: JSON.parse(localStorage.getItem('pf_returns')) || []
+    };
+
+    function saveState(){
+      localStorage.setItem('pf_products', JSON.stringify(state.products));
+      localStorage.setItem('pf_cart', JSON.stringify(state.cart));
+      localStorage.setItem('pf_orders', JSON.stringify(state.orders));
+      localStorage.setItem('pf_returns', JSON.stringify(state.returns));
+      document.getElementById('cartCount').innerText = Object.values(state.cart).reduce((s,i)=>s+i.qty,0);
+    }
+
+    const productsGrid = document.getElementById('productsGrid');
+
+    function buildCategoryOptions(){
+      const sel = document.getElementById('categoryFilter');
+      const cats = ['all', ...new Set(state.products.map(p=>p.category))];
+      sel.innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+
+    function renderProducts(filters={}){
+      const q = (document.getElementById('searchInput').value||'').toLowerCase();
+      let items = state.products.filter(p=>(p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)));
+      if(filters.category && filters.category!=='all') items = items.filter(p=>p.category===filters.category);
+      if(filters.minPrice) items = items.filter(p=>p.price >= Number(filters.minPrice));
+      if(filters.maxPrice) items = items.filter(p=>p.price <= Number(filters.maxPrice));
+      document.getElementById('resultInfo').innerText = `Showing ${items.length} product(s)`;
+      productsGrid.innerHTML = items.map(p=>`
+        <div class="product" data-id="${p.id}">
+          <img src="${p.img}" alt="${p.title}" />
+          <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600">${p.title}</div><div class="badge">${p.category}</div></div>
+          <div class="meta"><div class="price">$${p.price.toFixed(2)}</div><div class="muted">Stock: ${p.qty}</div></div>
+          <div style="display:flex;gap:8px"><button class="btn add" data-id="${p.id}">Add to cart</button><button class="btn secondary view" data-id="${p.id}">View</button></div>
+        </div>
+      `).join('');
+      document.querySelectorAll('.add').forEach(btn=>btn.addEventListener('click',()=>addToCart(btn.dataset.id)));
+      document.querySelectorAll('.view').forEach(btn=>btn.addEventListener('click',()=>{const item = state.products.find(x=>x.id===btn.dataset.id); alert(`${item.title}
+Price: $${item.price.toFixed(2)}
+Category: ${item.category}`)}));
+    }
+
+    function addToCart(id){
+      const product = state.products.find(p=>p.id===id);
+      if(!product) return;
+      if(!state.cart[id]) state.cart[id]={...product, qty:0};
+      if(state.cart[id].qty+1 > product.qty){ alert('Not enough stock'); return; }
+      state.cart[id].qty += 1; saveState(); renderCart(); document.getElementById('cartDrawer').style.display='block';
+    }
+
+    function renderCart(){
+      const container = document.getElementById('cartItems');
+      const items = Object.values(state.cart);
+      if(items.length===0) container.innerHTML = '<div class="muted">Cart is empty</div>';
+      else container.innerHTML = items.map(i=>`
+        <div class="cart-item" data-id="${i.id}">
+          <img src="${i.img}" width="60" height="60" style="object-fit:cover;border-radius:6px" />
+          <div style="flex:1"><div style="font-weight:600">${i.title}</div><div class="muted">$${i.price.toFixed(2)} each</div></div>
+          <div style="text-align:right"><div class="qty"><button class="btn secondary dec" data-id="${i.id}">-</button><div style="padding:6px">${i.qty}</div><button class="btn secondary inc" data-id="${i.id}">+</button></div><div style="margin-top:6px;font-weight:700">$${(i.qty*i.price).toFixed(2)}</div></div>
+        </div>
+      `).join('');
+      document.querySelectorAll('.inc').forEach(b=>b.addEventListener('click',()=>addToCart(b.dataset.id)));
+      document.querySelectorAll('.dec').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.id; if(!state.cart[id]) return; state.cart[id].qty-=1; if(state.cart[id].qty<=0) delete state.cart[id]; saveState(); renderCart();}));
+      const total = items.reduce((s,i)=>s+i.price*i.qty,0);
+      document.getElementById('cartTotal').innerText = '$'+ total.toFixed(2);
+      document.getElementById('cartCount').innerText = items.reduce((s,i)=>s+i.qty,0);
+    }
+
+    function checkout(){
+      const items = Object.values(state.cart);
+      if(items.length===0){ alert('Cart empty'); return; }
+      const order = {
+        id: 'ORD-'+Date.now(),
+        createdAt: new Date().toISOString(),
+        items: items.map(i=>({id:i.id,title:i.title,price:i.price,qty:i.qty})),
+        total: items.reduce((s,i)=>s+i.qty*i.price,0),
+        status: 'Pending',
+        history: [{status:'Pending',at:new Date().toISOString(),note:'Order created'}]
+      };
+      order.items.forEach(it=>{const p = state.products.find(x=>x.id===it.id); if(p) p.qty -= it.qty;});
+      state.orders.push(order); state.cart = {}; saveState(); renderProducts({}); renderCart(); document.getElementById('cartDrawer').style.display='none';
+      alert('Order placed!');
+      Order ID: '+order.id+'
+      Total: $'+order.total.toFixed(2)); renderMyOrders()';
+    }
+
+    // User-visible orders (session-based) + cancel before shipping
+    function renderMyOrders(){
+      const container = document.getElementById('myOrders');
+      const my = state.orders.slice().reverse();
+      if(my.length===0){ container.innerHTML = '<div class="muted">No orders yet. Place an order to see it here.</div>'; return; }
+      container.innerHTML = my.map(o=>{
+        const statusClass = o.status==='Pending'? 'st-pending' : o.status==='Shipped'? 'st-shipped' : o.status==='Completed'? 'st-completed' : 'st-canceled';
+        return `
+          <div style="padding:10px;border-radius:8px;background:#fff;margin-bottom:8px;box-shadow:0 6px 18px rgba(11,105,255,0.03)">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${o.id}</strong><div class="muted">${new Date(o.createdAt).toLocaleString()}</div></div><div class="status-pill ${statusClass}">${o.status}</div></div>
+            <div style="margin-top:8px">${o.items.map(i=>`<div>${i.qty} × ${i.title} — $${(i.qty*i.price).toFixed(2)}</div>`).join('')}</div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              ${o.status==='Pending'? `<button class="btn cancelOrderBtn" data-id="${o.id}">Cancel order</button>`: ''}
+              ${o.status!=='Canceled'? `<button class="btn secondary viewOrderBtn" data-id="${o.id}">View details</button>`: ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      // attach
+      document.querySelectorAll('.cancelOrderBtn').forEach(b=>b.addEventListener('click',()=>clientCancelOrder(b.dataset.id)));
+      document.querySelectorAll('.viewOrderBtn').forEach(b=>b.addEventListener('click',()=>{const o = state.orders.find(x=>x.id===b.dataset.id); alert(JSON.stringify(o,null,2));}));
+    }
+
+    function clientCancelOrder(orderId){
+      const order = state.orders.find(o=>o.id===orderId);
+      if(!order){ alert('Order not found'); return; }
+      if(order.status !== 'Pending'){ alert('Only pending orders can be canceled by customer.'); return; }
+      const reason = prompt('Please provide a reason for cancellation (optional):');
+      order.status = 'Canceled';
+      order.canceledAt = new Date().toISOString();
+      order.canceledReason = reason || '';
+      order.history.push({status:'Canceled',at:new Date().toISOString(),note: reason||'Canceled by customer'});
+      // restore stock
+      order.items.forEach(it=>{ const p = state.products.find(x=>x.id===it.id); if(p) p.qty += it.qty; });
+      saveState(); renderProducts({}); renderMyOrders(); alert('Order canceled.');
+    }
+
+    // Admin functions
+    function openAdmin(){
+      const pw = prompt('Enter admin password (demo):'); if(pw !== 'admin123'){ alert('Wrong password'); return; }
+      const modal = document.getElementById('adminModal'); modal.style.display='flex'; renderAdmin();
+    }
+
+    function renderAdmin(){
+      const content = document.getElementById('adminContent');
+      const totalSales = state.orders.filter(o=>o.status!=='Canceled').reduce((s,o)=>s+o.total,0);
+      const orderCount = state.orders.length;
+      const statusFilterOptions = ['All','Pending','Shipped','Completed','Canceled'];
+      const byCategory = {};
+      state.orders.forEach(o=> o.items.forEach(i=>{ const p = state.products.find(x=>x.id===i.id); const cat = p? p.category : 'Unknown'; byCategory[cat] = (byCategory[cat]||0) + i.qty * i.price; }));
+      content.innerHTML = `
+        <div style="display:flex;gap:14px;margin-bottom:12px">
+          <div style="flex:1">
+            <div style="background:var(--glass);padding:12px;border-radius:10px;margin-bottom:10px"><div class="muted">Total sales (excluding canceled)</div><div style="font-size:20px;font-weight:700">$${totalSales.toFixed(2)}</div></div>
+            <div style="background:var(--glass);padding:12px;border-radius:10px;margin-bottom:10px"><div class="muted">Orders</div><div style="font-size:20px;font-weight:700">${orderCount}</div></div>
+          </div>
+          <div style="flex:1"><div style="background:var(--glass);padding:12px;border-radius:10px"><div class="muted">Sales by category</div><div id="catList" style="margin-top:8px"></div></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><label class="muted">Filter:</label><select id="adminStatusFilter">${statusFilterOptions.map(s=>`<option value="${s}">${s}</option>`).join('')}</select><button id="refreshAdmin" class="btn secondary">Refresh</button></div>
+        <div id="ordersList"></div>
+      `;
+      document.getElementById('catList').innerHTML = Object.keys(byCategory).map(k=>`<div style="display:flex;justify-content:space-between"><div>${k}</div><div>$${byCategory[k].toFixed(2)}</div></div>`).join('') || '<div class="muted">No sales yet</div>';
+      document.getElementById('refreshAdmin').addEventListener('click',renderAdmin);
+      document.getElementById('adminStatusFilter').addEventListener('change',renderAdminOrders);
+      renderAdminOrders();
+    }
+
+    function renderAdminOrders(){
+      const list = document.getElementById('ordersList');
+      const filter = document.getElementById('adminStatusFilter').value;
+      const ordersToShow = state.orders.filter(o=> filter==='All' ? true : o.status===filter);
+      if(ordersToShow.length===0){ list.innerHTML = '<div class="muted">No orders match the filter</div>'; return; }
+      list.innerHTML = ordersToShow.slice().reverse().map(o=>{
+        const statusClass = o.status==='Pending'? 'st-pending' : o.status==='Shipped'? 'st-shipped' : o.status==='Completed'? 'st-completed' : 'st-canceled';
+        return `
+          <div style="padding:10px;border-radius:8px;background:#fff;margin-bottom:8px;box-shadow:0 6px 18px rgba(11,105,255,0.03)">
+            <div style="display:flex;justify-content:space-between"><div><strong>${o.id}</strong><div class="muted">${new Date(o.createdAt).toLocaleString()}</div></div><div style="font-weight:700">$${o.total.toFixed(2)}</div></div>
+            <div style="margin-top:8px">${o.items.map(i=>`<div>${i.qty} × ${i.title} — $${(i.qty*i.price).toFixed(2)}</div>`).join('')}</div>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div class="status-pill ${statusClass}">${o.status}</div>
+              <select class="setStatus" data-id="${o.id}"><option value="Pending">Pending</option><option value="Shipped">Shipped</option><option value="Completed">Completed</option><option value="Canceled">Canceled</option></select>
+              <button class="btn setStatusBtn" data-id="${o.id}">Set</button>
+              <button class="btn secondary viewOrderAdmin" data-id="${o.id}">Details</button>
+            </div>
+            <div style="margin-top:8px" class="orderHistory_${o.id}"></div>
+          </div>
+        `;
+      }).join('');
+      document.querySelectorAll('.setStatusBtn').forEach(b=>b.addEventListener('click',()=>{
+        const id=b.dataset.id; const sel=document.querySelector(`select.setStatus[data-id="${id}"]`); updateOrderStatus(id, sel.value);
+      }));
+      document.querySelectorAll('.viewOrderAdmin').forEach(b=>b.addEventListener('click',()=>{const o = state.orders.find(x=>x.id===b.dataset.id); alert(JSON.stringify(o,null,2));}));
+      // populate selects to current status
+      state.orders.forEach(o=>{ const sel = document.querySelector(`select.setStatus[data-id="${o.id}"]`); if(sel) sel.value = o.status; const hist = document.querySelector(`.orderHistory_${o.id}`); if(hist) hist.innerHTML = o.history.map(h=>`<div class="muted">${h.status} — ${new Date(h.at).toLocaleString()}${h.note? ' — '+h.note: ''}</div>`).join(''); });
+    }
+
+    function updateOrderStatus(orderId,newStatus){
+      const order = state.orders.find(o=>o.id===orderId); if(!order) { alert('Order not found'); return; }
+      if(order.status === newStatus){ alert('Status unchanged'); return; }
+      // if canceling, restore stock
+      if(newStatus === 'Canceled' && order.status !== 'Canceled'){
+        order.items.forEach(it=>{ const p = state.products.find(x=>x.id===it.id); if(p) p.qty += it.qty; });
+        order.canceledAt = new Date().toISOString();
+        order.canceledReason = prompt('Provide reason for cancellation (optional):') || '';
+      }
+      order.status = newStatus;
+      order.history.push({status:newStatus,at:new Date().toISOString(),note: newStatus==='Canceled' ? (order.canceledReason||'Canceled by admin') : ('Status set to '+newStatus)});
+      saveState(); renderProducts({}); renderAdmin(); renderMyOrders(); alert('Order updated');
+    }
+
+    // Return / exchange form handler (stores requests and if cancel requested, attempts cancel)
+    document.getElementById('returnForm').addEventListener('submit',function(e){
+      e.preventDefault();
+      const orderId = document.getElementById('orderIdInput').value.trim();
+      const reason = document.getElementById('reason').value;
+      const comments = document.getElementById('comments').value.trim();
+      if(!orderId){ alert('Please enter Order ID'); return; }
+      const order = state.orders.find(o=>o.id===orderId);
+      if(!order){ alert('Order not found'); return; }
+      const req = {id:'R-'+Date.now(),orderId,reason,comments,status:'submitted',createdAt:new Date().toISOString()};
+      state.returns.push(req);
+      // if user requested cancel and order is pending, cancel immediately
+      if(reason==='cancel'){
+        if(order.status==='Pending'){
+          order.status='Canceled'; order.canceledAt=new Date().toISOString(); order.canceledReason = comments || 'Canceled via customer request'; order.history.push({status:'Canceled',at:new Date().toISOString(),note: order.canceledReason}); order.items.forEach(it=>{ const p = state.products.find(x=>x.id===it.id); if(p) p.qty += it.qty; });
+          saveState(); renderProducts({}); renderMyOrders(); alert('Order canceled successfully');
+        } else {
+          alert('Order cannot be canceled because it is not in Pending state. A return/cancel request has been recorded for admin review.');
+          saveState();
+        }
+      } else {
+        saveState(); alert('Return/Exchange request submitted. Admin will review it (demo).');
+      }
+      this.reset();
+    });
+
+    document.getElementById('openCartBtn').addEventListener('click',()=>document.getElementById('cartDrawer').style.display='block');
+    document.getElementById('closeCart').addEventListener('click',()=>document.getElementById('cartDrawer').style.display='none');
+    document.getElementById('clearCart').addEventListener('click',()=>{state.cart={};saveState();renderCart();});
+    document.getElementById('checkout').addEventListener('click',checkout);
+    document.getElementById('applyFilters').addEventListener('click',()=>{renderProducts({category:document.getElementById('categoryFilter').value,minPrice:document.getElementById('minPrice').value,maxPrice:document.getElementById('maxPrice').value});});
+    document.getElementById('clearFilters').addEventListener('click',()=>{document.getElementById('categoryFilter').value='all';document.getElementById('minPrice').value='';document.getElementById('maxPrice').value='';renderProducts({})});
+    document.getElementById('searchInput').addEventListener('input',()=>renderProducts({category:document.getElementById('categoryFilter').value}));
+    document.getElementById('openAdminBtn').addEventListener('click',openAdmin);
+    document.getElementById('closeAdmin').addEventListener('click',()=>document.getElementById('adminModal').style.display='none');
+
+    // initial render
+    buildCategoryOptions(); renderProducts({}); renderCart(); saveState(); renderMyOrders();
+
+    window._PF = {state, saveState, renderProducts, renderCart, renderAdmin, renderMyOrders};
+  </script>
+</body>
+</html>
